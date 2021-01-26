@@ -9,9 +9,9 @@ Web App to easily configure switchports using premade port profiles. This uses P
 
 
 ## Examples
-- [8 Port Switch](/QBSB-S48U-VH7E)
-- [24 Port Switch](/Q2EW-ATJ2-QFN3)
-- [48 Port Switch](/QBSB-AU53-GZLN)
+- [8 Port Switch](https://switchports-drag-drop.herokuapp.com/QBSB-S48U-VH7E)
+- [24 Port Switch](https://switchports-drag-drop.herokuapp.com/Q2EW-ATJ2-QFN3)
+- [48 Port Switch](https://switchports-drag-drop.herokuapp.com/QBSB-AU53-GZLN)
 
 ![Image of App](https://github.com/benbenbenbenbenbenbenbenbenben/switchports-drag-drop/blob/main/page.png?raw=true)
 

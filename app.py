@@ -26,6 +26,11 @@ m = meraki.DashboardAPI(
 # Controllers
 #----------------------------------------------------------------------------#
 
+# Index Page
+@app.route('/')
+def index():
+    return render_template('base.html', app_title=app_title, contents='404.html', serial='Requires Serial')
+
 # Main Page
 @app.route('/<serial>', methods=["GET"])
 def switch(serial):
