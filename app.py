@@ -26,19 +26,20 @@ m = meraki.DashboardAPI(
 # Controllers
 #----------------------------------------------------------------------------#
 
-# Index Page
-@app.route('/')
-def index():
-    return render_template('base.html', app_title=app_title, contents='404.html', serial='Requires Serial')
-
 # Main Page
 @app.route('/<serial>', methods=["GET"])
 def switch(serial):
+    # Get Switch
     try:
         switch = get_switch(serial)
     except:
         return render_template('base.html', app_title=app_title, contents='404.html', serial=serial)
-    ports = get_ports(serial)
+    # Get Switchports
+    try:
+        ports = get_ports(serial)
+    except:
+        return render_template('base.html', app_title=app_title, contents='404.html', serial=serial)
+    # Get Profiles
     profiles = read_json_file('profiles')
     return render_template('base.html', app_title=app_title, contents='switch.html', profiles=profiles, ports=ports, serial=serial, switch=switch)
 
@@ -68,6 +69,11 @@ def ports():
         except Exception as e:
             print(f'some other error: {e}')
             return f'reason = {e}'
+
+# 404
+@app.errorhandler(404)
+def page_not_found(error):
+   render_template('base.html', app_title=app_title, contents='404.html', serial='Alakazam!'), 404
 
 #----------------------------------------------------------------------------#
 # Functions
