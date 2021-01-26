@@ -13,9 +13,9 @@ Web App to easily configure switchports using premade port profiles. This uses P
 - [24 Port Switch](/Q2EW-ATJ2-QFN3)
 - [48 Port Switch](/QBSB-AU53-GZLN)
 
-![Image of App]()
+![Image of App](https://github.com/benbenbenbenbenbenbenbenbenben/switchports-drag-drop/blob/main/page.png?raw=true)
 
-![Gif of App]()
+![Gif of App](https://github.com/benbenbenbenbenbenbenbenbenben/switchports-drag-drop/blob/main/demo.gif?raw=true)
 
 ## Setup
 1. Ensure you have Python version 3 installed (If not download and install)
