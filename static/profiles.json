@@ -1,0 +1,52 @@
+[
+    {
+        "name": "Wifi",
+        "tags": ["wifi","profile"],
+        "enabled": true,
+        "poeEnabled": true,
+        "type": "trunk",
+        "vlan": "2",
+        "icon": "wifi",
+        "hex": "#57cc99"
+    },
+    {
+        "name": "Server",
+        "tags": ["server","profile"],
+        "enabled": true,
+        "poeEnabled": false,
+        "type": "access",
+        "vlan": "4",
+        "icon": "server",
+        "hex": "#9966ff"
+    },
+    {
+        "name": "Phone",
+        "tags": ["phone","profile"],
+        "enabled": true,
+        "poeEnabled": true,
+        "type": "access",
+        "vlan": "10",
+        "icon": "phone",
+        "hex": "#ffce56"
+    },
+    {
+        "name": "Block",
+        "tags": ["block","profile"],
+        "enabled": false,
+        "poeEnabled": false,
+        "type": "access",
+        "vlan": "2",
+        "icon": "ban",
+        "hex": "#ff6384"
+    },
+    {
+        "name": "Reset",
+        "tags": [],
+        "enabled": true,
+        "poeEnabled": false,
+        "type": "trunk",
+        "vlan": "1",
+        "icon": "undo",
+        "hex": "#36a2eb"
+    }
+]

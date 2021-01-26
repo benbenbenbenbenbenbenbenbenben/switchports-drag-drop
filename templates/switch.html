@@ -1,0 +1,279 @@
+<div class="panel-header">
+    <div class="header text-center">
+        <h2 class="title">Switch Port Editor</h2>
+        <p class="subtitle">Update your switch ports via
+            <a href="https://github.com/benbenbenbenbenbenbenbenbenben/switchports-drag-drop.git">Drag and Drop</a>.    
+        </p>
+        <h4 class="title">{{ switch['model'] }}</h2>
+    </div>
+</div>
+<div class="content m-5">
+    <div class="row">
+        <div class="col-md-12 mb-5">
+            <section class="draggable-elements" id="profilePallete"></section>
+            <section id="switch">
+                <div id="portsTop" class="ports"></div>
+                <div id="portsBottom" class="ports"></div>
+            </section>
+            <section>
+                <button id="saveBtn" type="button" class="btn btn-lg btn-primary float-right" disabled onclick="savePorts()">Save</button>
+            </section>
+        </div>
+    </div>
+    <!-- Legend -->
+    <button class="btn btn-block text-left mt-5" type="button" data-toggle="collapse" data-target="#legendMain">
+        <h2 class="m-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-arrow-bar-down float-right" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M1 3.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5zM8 6a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 .708-.708L7.5 12.293V6.5A.5.5 0 0 1 8 6z"/>
+            </svg>
+        Legend</h2>
+    </button>
+    <div id="legendMain" class="collapse">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="profileList" class="table">  
+                                <thead class=" text-primary">  
+                                    <th>Icon</th>
+                                    <th>Profile</th>
+                                    <th>Enabled</th>
+                                    <th>PoE</th>
+                                    <th>Type</th>
+                                    <th>Vlan</th>
+                                    <th>Tags</th>
+                                </thead>     
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Legend -->
+</div>
+
+<script>
+// Elements
+const portsTop = document.getElementById('portsTop')
+const portsBottom = document.getElementById('portsBottom')
+const profilePallete = document.getElementById('profilePallete')
+
+// Data
+const profiles = {{profiles|tojson|safe}}
+const ports = {{ ports|tojson|safe }}
+const serial = '{{ serial }}'
+
+let fibrePorts
+
+// Build Switch Port
+function buildSwitchPortBlank(portId, position){
+    position.insertAdjacentHTML("beforeend",'<div class="droppable" data-draggable-id="' + portId +'"><span>' + portId +'</span></div>')
+}
+
+function buildSwitchPortProfile(portId, position, profile, icon){
+    let colour = window.getComputedStyle(document.getElementById(profile)).color
+    position.insertAdjacentHTML("beforeend",'<div class="droppable dropped '+profile+'" data-draggable-id="' + portId +'" style="background-color: '+colour+';"><i class="fas fa-'+icon+'"></i><span>' + portId +'</span></div>')
+}
+
+// Load Profile Pallette
+profiles.forEach(p => {
+    // Add Draggable Profile Icon To Pallette
+    profilePallete.insertAdjacentHTML("beforeend",'<i class="fas fa-'+ p.icon.toLowerCase() +' draggable" draggable="true" style="color: '+ p.hex +';" id="'+ p.name.toLowerCase() +'"></i>')
+    // Add Profile To Legend Table
+    let output = `
+        <tr>
+        <td><i class="fas fa-${p.icon.toLowerCase()}"></i></td>
+        <td>${p.name}</td>
+        <td>${p.enabled}</td>
+        <td>${p.poeEnabled}</td>
+        <td>${p.type}</td>
+        <td>${p.vlan}</td>
+        <td>${p.tags}</td>
+        </tr>
+    `
+    $(output).appendTo("#profileList")
+})
+
+// Load Port Configs
+// Check Switch Size
+
+// 24 Port Stackable
+if (ports.length == 30){
+    ports.length = 28 // Remove Stacking Ports
+    fibrePorts = ports.splice(24, 4)  // Fibre Ports
+}
+// 24 Port
+else if (ports.length == 28) {
+    fibrePorts = ports.splice(24, 4)  // Fibre Ports
+} 
+// 48 Port Stackable
+else if (ports.length == 54) {
+    ports.length = 52 // Remove Stacking Ports
+    fibrePorts = ports.splice(48, 4)  // Fibre Ports
+} 
+// 48 Port
+else if (ports.length == 52) {
+    fibrePorts = ports.splice(48, 4)  // Fibre Ports
+} 
+// 8 Port
+else if (ports.length == 10) {
+    fibrePorts = ports.splice(8, 2)  // Fibre Ports
+}
+
+// Invalid Switch
+else {
+    ports.length = 2
+    fibrePorts = ports.splice(1, 1)
+}
+
+// Ethernet Ports
+ports.forEach(port => {
+    let profileExists
+    const position = (port.portId % 2 == 0) ? portsBottom : portsTop
+    if (!!port.name){
+        profileExists = profiles.filter(profile => profile.name.toLowerCase() == port.name.toLowerCase())
+    }
+    if(profileExists === undefined || profileExists.length == 0){
+        buildSwitchPortBlank(port.portId, position)
+    } else {
+        buildSwitchPortProfile(port.portId, position, profileExists[0].name.toLowerCase(), profileExists[0].icon.toLowerCase())
+    }
+})
+
+// Add Cisco Logo
+portsTop.insertAdjacentHTML("beforeend",`
+    <svg xmlns="http://www.w3.org/2000/svg" width="108" height="57" viewBox="0 0 108 57" role="img">
+        <defs><path d="M0 22.769a2.348 2.348 0 0 0 3.935 1.545c.434-.403.7-.955.744-1.545v-5.2a2.34 2.34 0 0 0-4.679 0v5.2" id="bar_short" class="bar"></path><path d="M12.95 22.769a2.349 2.349 0 0 0 2.34 2.171 2.346 2.346 0 0 0 2.339-2.171V11.112a2.341 2.341 0 0 0-4.679 0V22.77" id="bar_tall" class="bar"></path><path d="M25.832 27.464a2.345 2.345 0 0 0 4.678 0V2.249a2.342 2.342 0 0 0-4.678 0v25.215" id="bar_grande" class="bar"></path><path d="M24.026 56.277v-5.002l-.098.043a9.253 9.253 0 0 1-3.605.915 5.303 5.303 0 0 1-3.63-1.07 4.644 4.644 0 0 1-1.58-2.244 5.395 5.395 0 0 1-.106-3 4.6 4.6 0 0 1 1.609-2.566 4.823 4.823 0 0 1 2.528-1.09 8.332 8.332 0 0 1 4.774.895l.108.056v-5.03l-.228-.061a12.78 12.78 0 0 0-4.552-.596 10.534 10.534 0 0 0-4.065.93 9.29 9.29 0 0 0-3.329 2.572 10.014 10.014 0 0 0-.182 12.18 9.546 9.546 0 0 0 5.292 3.403c2.211.538 4.528.456 6.697-.234l.367-.101" id="cisco_c"></path></defs><g fill="#eee" fill-rule="evenodd"><use href="#cisco_c"/><use href="#cisco_c" x="49.5"/><path d="M41.69 52.125l-.019 4.308.315.054c.989.185 1.987.313 2.99.385a18.1 18.1 0 0 0 2.642.051c.842-.06 1.675-.218 2.48-.468a6.862 6.862 0 0 0 2.573-1.371 5.19 5.19 0 0 0 1.498-2.148 5.912 5.912 0 0 0-.03-4.324 4.852 4.852 0 0 0-1.343-1.862 5.568 5.568 0 0 0-1.97-1.147l-3.25-1.206a1.742 1.742 0 0 1-.887-.845 1.107 1.107 0 0 1 .036-.986 1.29 1.29 0 0 1 .217-.291 1.75 1.75 0 0 1 .48-.347c.363-.18.755-.293 1.158-.337a6.76 6.76 0 0 1 2.072.022c.81.088 1.613.231 2.402.43l.168.037v-3.974l-.31-.067a21.14 21.14 0 0 0-2.444-.435 12.545 12.545 0 0 0-3.213-.014 6.945 6.945 0 0 0-3.699 1.488 4.908 4.908 0 0 0-1.58 2.178 5.984 5.984 0 0 0-.003 4.05c.242.65.63 1.237 1.136 1.714.437.422.932.78 1.47 1.065.708.38 1.458.675 2.235.878.257.077.512.158.766.243l.385.141.11.045c.38.136.726.35 1.018.628.202.19.358.423.455.683.06.237.061.485.003.723a1.536 1.536 0 0 1-.744.892 3.691 3.691 0 0 1-1.239.387 9 9 0 0 1-1.92.097 21.973 21.973 0 0 1-2.507-.334c-.433-.09-.864-.19-1.291-.303l-.16-.04zM30.546 56.607h4.73V37.846h-4.73zM85.305 43.386a4.934 4.934 0 1 1 6.157 7.711 4.934 4.934 0 0 1-6.157-7.71m-6.867 3.848A9.87 9.87 0 0 0 90.44 56.72a9.629 9.629 0 0 0 3.157-17.729 9.934 9.934 0 0 0-15.16 8.244"></path><use href="#bar_short" x="0"/><use href="#bar_tall" x="0"/><use href="#bar_grande" x="0"/><use href="#bar_tall" x="25.875"/><use href="#bar_short" x="51.75"/><use href="#bar_tall" x="51.75"/><use href="#bar_grande" x="51.75"/><use href="#bar_tall" x="77.625"/><use href="#bar_short" x="103.375"/></g>
+    </svg>`
+)
+
+// Fibre Ports
+portsBottom.insertAdjacentHTML("beforeend",'<span class="mr-3"></span>')
+fibrePorts.forEach(port => {
+    let profileExists
+    if (!!port.name){
+        profileExists = profiles.filter(profile => profile.name.toLowerCase() == port.name.toLowerCase());
+    }
+    if(profileExists === undefined || profileExists.length == 0){
+        buildSwitchPortBlank(port.portId, portsBottom)
+    } else {
+        buildSwitchPortProfile(port.portId, portsBottom, profileExists[0].name.toLowerCase(), profileExists[0].icon.toLowerCase())
+    }
+})
+
+// Get Icon
+function getIcon(profileName){
+    const profile = profiles.filter(p => p.name.toLowerCase() == profileName.toLowerCase())
+    return profile[0].icon
+}
+
+// Drag and Drop
+// Setup Event Listeners
+const draggableElements = document.querySelectorAll(".draggable");
+const droppableElements = document.querySelectorAll(".droppable");
+
+draggableElements.forEach(elem => {
+  elem.addEventListener("dragstart", dragStart); // Fires as soon as the user starts dragging an item - This is where we can define the drag data
+});
+
+droppableElements.forEach(elem => {
+  elem.addEventListener("dragenter", dragEnter); // Fires when a dragged item enters a valid drop target
+  elem.addEventListener("dragover", dragOver); // Fires when a dragged item is being dragged over a valid drop target, repeatedly while the draggable item is within the drop zone
+  elem.addEventListener("dragleave", dragLeave); // Fires when a dragged item leaves a valid drop target
+  elem.addEventListener("drop", drop); // Fires when an item is dropped on a valid drop target
+});
+
+// Drag and Drop Functions
+//Events fired on the drag target
+function dragStart(event) {
+  event.dataTransfer.setData("text", event.target.id); // or "text/plain" but just "text" would also be fine since we are not setting any other type/format for data value
+}
+
+//Events fired on the drop target
+function dragEnter(event) {
+//   if(!event.target.classList.contains("dropped")) {
+    event.target.classList.add("droppable-hover");
+    const droppableElementData = event.target.getAttribute("data-draggable-id");
+//   }
+}
+
+function dragOver(event) {
+    event.preventDefault(); // Prevent default to allow drop
+}
+
+function dragLeave(event) {
+//   if(!event.target.classList.contains("dropped")) {
+    event.target.classList.remove("droppable-hover");
+//   }
+}
+
+function drop(event) {
+    event.preventDefault(); // This is in order to prevent the browser default handling of the data
+    event.target.classList.remove("droppable-hover");
+    const draggableElementData = event.dataTransfer.getData("text"); // Profile ID
+    const droppableElementData = event.target.getAttribute("data-draggable-id"); // Port ID
+    const draggableElement = document.getElementById(draggableElementData); // Profile Element
+
+    // Reset Classes
+    event.target.className = 'droppable'
+    event.target.classList.add("dropped", draggableElementData);
+    event.target.style.backgroundColor = window.getComputedStyle(draggableElement).color;
+
+    // Get Icon
+    let icon = getIcon(draggableElementData)
+    // Swap Icons
+    if(event.target.children.length == 1){
+        event.target.insertAdjacentHTML("afterbegin",`<i class="fas fa-${icon}"></i>`);
+        document.getElementById('saveBtn').disabled = false
+    } else {
+        event.target.children[0].remove()
+        event.target.insertAdjacentHTML("afterbegin",`<i class="fas fa-${icon}"></i>`);
+        document.getElementById('saveBtn').disabled = false
+    }
+}
+
+// Save Port Profiles
+function savePorts(){
+    let ports = []
+    document.getElementById('saveBtn').disabled = true
+    document.getElementById('saveBtn').innerHTML = " Saving..."
+    document.getElementById('saveBtn').insertAdjacentHTML("afterbegin",'<span class="spinner-border spinner-border-sm" role="status"> </span>')
+    
+    // Check for applied profiles
+    droppableElements.forEach(elem => {
+        if(elem.classList.contains("dropped")){
+            let array = [elem.getAttribute("data-draggable-id"),elem.classList[2]]
+            ports.push(array)
+        }
+    })
+    put(ports)
+}
+
+async function put(ports) {
+    const promises = ports.map((port) => {
+        let url = '/ports?serial='+serial+'&port='+port[0]+'&profile='+port[1]
+        let data = fetch(url, {method: 'PUT',})
+        .then(res => {
+        return res.json()
+        })
+        .catch(err => {
+        console.log('Error: ', err)
+        })
+        
+    return data
+    })
+
+    // use await on Promise.all so the Promises execute in parallel
+    const awaitPorts = await Promise.all(promises);
+
+    // End Save
+    document.getElementById('saveBtn').children[0].remove()
+    document.getElementById('saveBtn').innerHTML = "Saved"
+    // Reload Page
+    setTimeout(function(){ location.reload(); }, 250);
+}
+
+</script>
+
