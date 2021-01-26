@@ -73,7 +73,7 @@ def ports():
 # 404
 @app.errorhandler(404)
 def page_not_found(error):
-   render_template('base.html', app_title=app_title, contents='404.html', serial='Alakazam!'), 404
+   return render_template('base.html', app_title=app_title, contents='404.html', serial='Alakazam!'), 404
 
 #----------------------------------------------------------------------------#
 # Functions
