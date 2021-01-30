@@ -25,6 +25,25 @@ m = meraki.DashboardAPI(
 )
 
 #----------------------------------------------------------------------------#
+# Decorators
+#----------------------------------------------------------------------------#
+
+# API Wait Timer
+def slow_down(_func=None, *, rate=1):
+    """Sleep given amount of seconds before calling the function"""
+    def decorator_slow_down(func):
+        @functools.wraps(func)
+        def wrapper_slow_down(*args, **kwargs):
+            time.sleep(rate)
+            return func(*args, **kwargs)
+        return wrapper_slow_down
+
+    if _func is None:
+        return decorator_slow_down
+    else:
+        return decorator_slow_down(_func)
+
+#----------------------------------------------------------------------------#
 # Controllers
 #----------------------------------------------------------------------------#
 
@@ -124,21 +143,6 @@ def get_switch(serial):
     except Exception as e:
         print(f'some other error: {e}')
     return switch
-
-# Meraki API Wait Timer
-def slow_down(_func=None, *, rate=1):
-    """Sleep given amount of seconds before calling the function"""
-    def decorator_slow_down(func):
-        @functools.wraps(func)
-        def wrapper_slow_down(*args, **kwargs):
-            time.sleep(rate)
-            return func(*args, **kwargs)
-        return wrapper_slow_down
-
-    if _func is None:
-        return decorator_slow_down
-    else:
-        return decorator_slow_down(_func)
 
 #----------------------------------------------------------------------------#
 # Launch
