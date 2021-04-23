@@ -2,13 +2,23 @@
 
 Web App to easily configure switchports using premade port profiles. This uses Python Flask for backend with simple JSON file to store profiles. Front End uses native JS for drag and drop functionality and Bootstrap for styling.  
 
+
 ## Table of Contents
 - [Examples](#examples)
 - [Setup](#setup)
 - [Profile Example JSON](#profile-example-json)
 
+## Usage
+Pass any serial number that your API key has access to - https://switchports-drag-drop.herokuapp.com/Q2EW-ATJ2-QFN3.
 
-## Examples
+App will get switchports and check for existing profiles.
+
+Select and drag a profile and drop on a port.
+
+Click save button to update changes.
+
+
+## Demo Examples
 - [8 Port Switch](https://switchports-drag-drop.herokuapp.com/QBSB-S48U-VH7E)
 - [24 Port Switch](https://switchports-drag-drop.herokuapp.com/Q2EW-ATJ2-QFN3)
 - [48 Port Switch](https://switchports-drag-drop.herokuapp.com/QBSB-AU53-GZLN)
@@ -47,6 +57,7 @@ python app.py
 ```
 
 ## Profile Example JSON
+static/profiles.json
 Required keys for app are name, icon, hex. All other params are optional for port config- https://developer.cisco.com/meraki/api-v1/#!update-device-switch-port
 ```json
 [
