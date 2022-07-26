@@ -11,12 +11,25 @@
     <div class="row">
         <div class="col-md-12 mb-5">
             <section class="draggable-elements" id="profilePallete"></section>
+
             <section id="switch">
                 <div id="portsTop" class="ports"></div>
                 <div id="portsBottom" class="ports"></div>
             </section>
             <section>
                 <button id="saveBtn" type="button" class="btn btn-lg btn-primary float-right" disabled onclick="savePorts()">Save</button>
+            </section>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 mb-5">
+            <!-- Rounded switch -->
+            <section id="paintCheckBox">
+                <label class="switch">
+                    <input type="checkbox" onclick="checkPaint(this)">
+                    <span class="slider round"></span>
+                </label>
+                <h5 class="text-muted"><i class="fas fa-paint-roller"></i> Paint</h5>
             </section>
         </div>
     </div>
@@ -189,6 +202,9 @@ droppableElements.forEach(elem => {
 //Events fired on the drag target
 function dragStart(event) {
   event.dataTransfer.setData("text", event.target.id); // or "text/plain" but just "text" would also be fine since we are not setting any other type/format for data value
+  if(paintEnabled){
+    brush = event.target.id
+  }
 }
 
 //Events fired on the drop target
@@ -196,6 +212,9 @@ function dragEnter(event) {
 //   if(!event.target.classList.contains("dropped")) {
     event.target.classList.add("droppable-hover");
     const droppableElementData = event.target.getAttribute("data-draggable-id");
+    if(paintEnabled){
+        paint(event)
+    }
 //   }
 }
 
@@ -233,6 +252,7 @@ function drop(event) {
         document.getElementById('saveBtn').disabled = false
     }
 }
+
 
 // Save Port Profiles
 function savePorts(){
@@ -273,6 +293,43 @@ async function put(ports) {
     document.getElementById('saveBtn').innerHTML = "Saved"
     // Reload Page
     setTimeout(function(){ location.reload(); }, 250);
+}
+
+// Port Painter
+let paintEnabled = false
+let brush = ""
+
+function checkPaint(element) {
+    if (element.checked == true){
+        paintEnabled = true
+    } else {
+        paintEnabled = false
+    }
+}
+
+function paint(event) {
+    event.preventDefault(); // This is in order to prevent the browser default handling of the data
+    event.target.classList.remove("droppable-hover");
+    const draggableElementData = brush
+    const droppableElementData = event.target.getAttribute("data-draggable-id"); // Port ID
+    const draggableElement = document.getElementById(draggableElementData); // Profile Element
+
+    // Reset Classes
+    event.target.className = 'droppable'
+    event.target.classList.add("dropped", draggableElementData);
+    event.target.style.backgroundColor = window.getComputedStyle(draggableElement).color;
+
+    // Get Icon
+    let icon = getIcon(draggableElementData)
+    // Swap Icons
+    if(event.target.children.length == 1){
+        event.target.insertAdjacentHTML("afterbegin",`<i class="fas fa-${icon}"></i>`);
+        document.getElementById('saveBtn').disabled = false
+    } else {
+        event.target.children[0].remove()
+        event.target.insertAdjacentHTML("afterbegin",`<i class="fas fa-${icon}"></i>`);
+        document.getElementById('saveBtn').disabled = false
+    }
 }
 
 </script>
