@@ -7,6 +7,7 @@ import meraki
 import json
 import functools
 import time
+import os
 
 #----------------------------------------------------------------------------#
 # App Config
@@ -65,7 +66,7 @@ def switch(serial):
     return render_template('base.html', app_title=app_title, contents='switch.html', profiles=profiles, ports=ports, serial=serial, switch=switch)
 
 # Ports
-@slow_down(rate=0.25)
+@slow_down(rate=0.1)
 @app.route('/ports', methods=["PUT"])
 def ports():
     # Update Port
@@ -154,6 +155,6 @@ def get_switch(serial):
 
 # Or specify port manually:
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 5050))
     app.run(host='0.0.0.0', port=port)
 
