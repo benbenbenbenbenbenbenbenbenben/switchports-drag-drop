@@ -248,25 +248,50 @@ function savePorts(){
             ports.push(array)
         }
     })
+    console.log(ports)
     put(ports)
 }
 
-async function put(ports) {
-    const promises = ports.map((port) => {
-        let url = '/ports?serial='+serial+'&port='+port[0]+'&profile='+port[1]
-        let data = fetch(url, {method: 'PUT',})
-        .then(res => {
-        return res.json()
-        })
-        .catch(err => {
-        console.log('Error: ', err)
-        })
+// async function put(ports) {
+//     const promises = ports.map((port) => {
+//         let url = '/ports?serial='+serial+'&port='+port[0]+'&profile='+port[1]
+//         let data = fetch(url, {method: 'PUT',})
+//         .then(res => {
+//         return res.json()
+//         })
+//         .catch(err => {
+//         console.log('Error: ', err)
+//         })
         
-    return data
-    })
+//     return data
+//     })
 
-    // use await on Promise.all so the Promises execute in parallel
-    const awaitPorts = await Promise.all(promises);
+//     // use await on Promise.all so the Promises execute in parallel
+//     const awaitPorts = await Promise.all(promises);
+
+//     // End Save
+//     document.getElementById('saveBtn').children[0].remove()
+//     document.getElementById('saveBtn').innerHTML = "Saved"
+//     // Reload Page
+//     setTimeout(function(){ location.reload(); }, 250);
+// }
+
+async function put(ports) {
+    const response = await fetch('/updatePorts', {
+        method: 'PUT',
+        headers: {
+            'Content-type': 'application/json'
+        },
+        body: JSON.stringify({ 
+            "serial": serial,
+            "ports": ports
+        })
+    })
+    if (!response.ok) {
+        const message = `An error has occured: ${response.status}`;
+        throw new Error(message);
+    } 
+    const awaitPorts = await response.json()
 
     // End Save
     document.getElementById('saveBtn').children[0].remove()
