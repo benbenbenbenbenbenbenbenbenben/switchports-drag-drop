@@ -9,7 +9,7 @@ Web App to easily configure switchports using premade port profiles. This uses P
 - [Profile Example JSON](#profile-example-json)
 
 ## Usage
-Pass any serial number that your API key has access to - https://switchports-drag-drop.herokuapp.com/Q2EW-ATJ2-QFN3.
+Pass any serial number that your API key has access to - https://switchports-drag-drop-s7rhepsyzq-ey.a.run.app/Q2EW-ATJ2-QFN3.
 
 App will get switchports and check for existing profiles.
 
@@ -19,9 +19,10 @@ Click save button to update changes.
 
 
 ## Demo Examples
-- [8 Port Switch](https://switchports-drag-drop.herokuapp.com/QBSB-S48U-VH7E)
-- [24 Port Switch](https://switchports-drag-drop.herokuapp.com/Q2EW-ATJ2-QFN3)
-- [48 Port Switch](https://switchports-drag-drop.herokuapp.com/QBSB-AU53-GZLN)
+https://switchports-drag-drop-s7rhepsyzq-ey.a.run.app/
+- [8 Port Switch]()
+- [24 Port Switch](https://switchports-drag-drop-s7rhepsyzq-ey.a.run.app/)
+- [48 Port Switch]()
 
 ![Image of App](https://github.com/benbenbenbenbenbenbenbenbenben/switchports-drag-drop/blob/main/page.png?raw=true)
 
